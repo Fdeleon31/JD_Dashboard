@@ -1,22 +1,18 @@
 // =============================================================
 // importar-excel.js
 // Convierte la contabilidad (Google Sheet descargado como .xlsx)
-// en los datos que publica el portal.
+// en los datos del panel de la junta.
 //
 // Lee:      privado/*.xlsx   (el único Excel que haya en la carpeta privado)
-// Escribe:  data/movimientos.csv      -> PÚBLICO: totales anuales por fuente y programa
-//           data/info.json            -> PÚBLICO: períodos y fecha de corte (conserva tus notas)
-//           privado/resumen-junta.json -> PRIVADO: liquidez trimestral para la junta
-//                                         (cifrar-junta.js lo convierte en la página de la junta)
+// Escribe:  privado/resumen-junta.json  -> PRIVADO: liquidez trimestral para la junta.
+//           No se publica: cifrar-junta.js lo cifra para el panel.
 //
 // Uso:  node importar-excel.js
 //       node importar-excel.js privado/otro-archivo.xlsx   (si quieres indicar el archivo)
 // Después: node cifrar-junta.js   y luego   node validar.js
 //
-// Reglas de privacidad:
-//   - Nunca lee las columnas "Descripción del banco" ni "Nota" (tienen nombres de personas).
-//   - Solo publica cuentas con Publicar = "Sí" en Plan_Cuentas.
-//   - Publica TOTALES ANUALES, no movimientos uno por uno.
+// Antes de generar nada revisa que los controles del Sheet estén en cero.
+// Nunca lee las columnas "Descripción del banco" ni "Nota" (tienen nombres de personas).
 // =============================================================
 
 const fs = require('fs');
@@ -189,39 +185,10 @@ const filasCSV = Object.keys(grupos).sort().map(function (k) { return grupos[k];
 const negativos = filasCSV.filter(function (g) { return g.centavos < 0; });
 if (negativos.length > 0) detener('Hay totales negativos (ej. ' + negativos[0].categoria + ' ' + negativos[0].anio + '). Revisa devoluciones en el Sheet.');
 
-// Comillas para el CSV si el texto tiene coma o comillas
-const campoCSV = function (t) { return /[",]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
-const lineas = ['fecha,tipo,categoria,programa,descripcion,monto'];
-filasCSV.forEach(function (g) {
-  const descripcion = 'Total ' + g.anio + ' (' + g.cantidad + ' movimiento' + (g.cantidad === 1 ? '' : 's') + ')';
-  lineas.push([ultimaFechaDelAnio[g.anio], g.tipo, campoCSV(g.categoria), campoCSV(g.programa), campoCSV(descripcion), aTexto(g.centavos)].join(','));
-});
-fs.writeFileSync(path.join(RAIZ, 'data', 'movimientos.csv'), lineas.join('\n') + '\n', 'utf8');
-
-// 2e. info.json: períodos por año + todo el historial. Se conservan tus notas y textos.
-const rutaInfo = path.join(RAIZ, 'data', 'info.json');
-const info = JSON.parse(fs.readFileSync(rutaInfo, 'utf8'));
+// 2e. Fecha de corte (último movimiento) y nombre de la fundación
 const anios = Object.keys(ultimaFechaDelAnio).sort();
-const primeraFecha = movimientos.map(function (m) { return m.fecha; }).sort()[0];
 const fechaCorte = ultimaFechaDelAnio[anios[anios.length - 1]];
-
-const nombreMes = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-const etiqueta = function (fecha) { return nombreMes[parseInt(fecha.slice(5, 7), 10) - 1] + ' ' + fecha.slice(0, 4); };
-
-info.organizacion = celda(libro, 'Config', 'B3') || info.organizacion;
-info.datos_de_ejemplo = false;
-info.fecha_corte = fechaCorte;
-info.periodos = anios.slice().reverse().map(function (a) {
-  const desde = a + '-01-01' > primeraFecha ? a + '-01-01' : primeraFecha;
-  const hasta = a + '-12-31' < fechaCorte ? a + '-12-31' : fechaCorte;
-  const completo = desde === a + '-01-01' && hasta === a + '-12-31';
-  return { id: a, nombre: completo ? 'Año ' + a : 'Año ' + a + ' (' + etiqueta(desde) + ' a ' + etiqueta(hasta) + ')', desde: desde, hasta: hasta };
-});
-info.periodos.push({ id: 'todo', nombre: 'Todo (' + etiqueta(primeraFecha) + ' a ' + etiqueta(fechaCorte) + ')', desde: primeraFecha, hasta: fechaCorte });
-// Período inicial: el último año completo, o el más reciente si no hay ninguno completo
-const completos = info.periodos.filter(function (p) { return p.nombre === 'Año ' + p.id; });
-info.periodo_inicial = (completos[0] || info.periodos[0]).id;
-fs.writeFileSync(rutaInfo, JSON.stringify(info, null, 2) + '\n', 'utf8');
+const organizacion = celda(libro, 'Config', 'B3') || 'Fundación';
 
 // 2f. Resumen PRIVADO para la junta: liquidez por trimestre (solo banco + caja chica)
 const saldoInicial = aCentavos(celda(libro, 'Config', 'B7'));
@@ -278,7 +245,7 @@ const saldoBancoSheet = aCentavos(celda(libro, 'Flujo_Caja', 'B11'));
 if (saldoBanco !== saldoBancoSheet) detener('El saldo calculado del banco (' + formato(saldoBanco) + ') no coincide con el del estado de cuenta (' + formato(saldoBancoSheet) + ').');
 
 fs.writeFileSync(path.join(RAIZ, 'privado', 'resumen-junta.json'), JSON.stringify({
-  organizacion: info.organizacion,
+  organizacion: organizacion,
   generado: new Date().toISOString().slice(0, 10),
   fecha_corte: fechaCorte,
   nota: 'PRIVADO. Liquidez por trimestre (banco + caja chica). No publicar.',
@@ -297,7 +264,7 @@ fs.writeFileSync(path.join(RAIZ, 'privado', 'resumen-junta.json'), JSON.stringif
 
 // ---------- 3. Reporte ----------
 
-console.log('\nTotales que se publican:');
+console.log('\nIngresos y gastos por año (para tu revisión, no se publican):');
 anios.forEach(function (a) {
   const ing = filasCSV.filter(function (g) { return g.anio === a && g.tipo === 'ingreso'; }).reduce(function (t, g) { return t + g.centavos; }, 0);
   const gas = filasCSV.filter(function (g) { return g.anio === a && g.tipo === 'gasto'; }).reduce(function (t, g) { return t + g.centavos; }, 0);
@@ -308,7 +275,5 @@ console.log('\nLiquidez al ' + fechaCorte + ': banco B/. ' + ultimo.saldo_banco 
 console.log('Alcanza para ' + mesesCubiertos + ' mes(es), con un gasto promedio de ' + formato(salidaMensualPromedio) + ' al mes (' + ultimos4[0] + ' a ' + ultimos4[ultimos4.length - 1] + ').');
 if (porRevisar > 0) console.log('\nAviso: ' + porRevisar + ' movimiento(s) siguen en estado "Propuesta" (clasificación sin revisar).');
 console.log('\nArchivos generados:');
-console.log('  data/movimientos.csv        (' + filasCSV.length + ' totales anuales, público)');
-console.log('  data/info.json              (períodos actualizados, público)');
 console.log('  privado/resumen-junta.json  (privado, no se publica)');
 console.log('\nSiguientes pasos: node cifrar-junta.js   y luego   node validar.js\n');

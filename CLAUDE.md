@@ -1,5 +1,9 @@
 # Proyecto: Portal de Transparencia para ONGs
 
+> **Estado actual (oct 2026):** el portal público para donantes se retiró. Lo publicado es solo
+> el **panel privado de la junta** (index.html, con contraseña y datos cifrados). La versión pública
+> quedó en el historial de git por si se retoma. Flujo vigente: ver README.md.
+
 ## Qué es
 Una página web pública donde una ONG muestra a sus donantes, de forma clara y verificable, cuánto dinero recibió, en qué lo gastó y qué impacto logró. El primer cliente y caso de prueba es **Fundación Wonder Panamá**.
 

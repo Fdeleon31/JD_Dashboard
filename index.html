@@ -3,103 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Transparencia · Fundación Wonder Panamá</title>
-  <meta name="description" content="Cuánto dinero recibió la fundación, en qué lo gastó y qué impacto logró.">
+  <!-- Que los buscadores no muestren esta página -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de la junta · Fundación Wonder Panamá</title>
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
 
-  <!-- Aviso de datos ficticios: se muestra solo si info.json dice "datos_de_ejemplo": true -->
-  <div id="aviso-ejemplo" class="aviso-ejemplo" hidden>
-    <strong>DATOS DE EJEMPLO</strong> · <span id="aviso-ejemplo-texto"></span>
-  </div>
-
   <header class="encabezado">
     <div class="contenedor">
-      <p class="encabezado-org" id="nombre-org">Fundación</p>
-      <h1>¿Cómo usamos tu donación?</h1>
-      <p class="encabezado-sub">Cuánto recibimos y en qué lo usamos. Cifras en <span id="moneda">USD (B/.)</span>.</p>
-      <!-- Selector de año: los botones se crean desde info.json -->
-      <div class="selector-periodo" id="selector-periodo" role="group" aria-label="Elegir período"></div>
+      <p class="encabezado-org" id="nombre-org">Panel de la junta</p>
+      <h1>Liquidez y caja</h1>
+      <p class="encabezado-sub">Uso interno de la junta directiva. Cifras en USD (B/.).</p>
     </div>
   </header>
 
   <main class="contenedor">
 
-    <div id="error-general" class="alerta alerta-error" hidden></div>
+    <!-- 1. CONTRASEÑA: los datos están cifrados y solo se abren aquí, en tu navegador -->
+    <section class="seccion" id="seccion-acceso" aria-labelledby="titulo-acceso">
+      <h2 id="titulo-acceso">Acceso</h2>
+      <p class="seccion-sub">Escribe la contraseña que te compartió la Dirección de Finanzas.</p>
+      <form id="form-acceso" class="form-acceso">
+        <label for="clave">Contraseña</label>
+        <input id="clave" type="password" autocomplete="current-password" required>
+        <button type="submit" id="boton-entrar">Entrar</button>
+      </form>
+      <p id="mensaje-acceso" class="mensaje-acceso" role="alert"></p>
+    </section>
 
-    <!-- 1. RESUMEN DEL PERÍODO -->
-    <section class="seccion" aria-labelledby="titulo-resumen">
-      <h2 id="titulo-resumen">Resumen <span class="periodo-texto" id="periodo-texto"></span></h2>
-      <div class="tarjetas-resumen">
-        <div class="tarjeta">
-          <p class="tarjeta-etiqueta">Recibimos</p>
-          <p class="tarjeta-valor" id="total-ingresos">—</p>
-          <p class="tarjeta-nota" id="nota-ingresos"></p>
+    <!-- 2. PANEL: se muestra solo después de descifrar -->
+    <div id="panel" hidden>
+
+      <section class="seccion" aria-labelledby="titulo-liquidez">
+        <h2 id="titulo-liquidez">Liquidez al <span id="fecha-corte">—</span></h2>
+        <div class="tarjetas-resumen">
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Total disponible</p>
+            <p class="tarjeta-valor" id="liquidez-total">—</p>
+            <p class="tarjeta-nota" id="liquidez-detalle"></p>
+          </div>
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Meses que alcanza</p>
+            <p class="tarjeta-valor" id="meses-cubiertos">—</p>
+            <p class="tarjeta-nota" id="meses-detalle"></p>
+          </div>
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Fondos libres</p>
+            <p class="tarjeta-valor" id="fondos-libres">—</p>
+            <p class="tarjeta-nota" id="fondos-detalle"></p>
+          </div>
         </div>
-        <div class="tarjeta">
-          <p class="tarjeta-etiqueta">Gastamos</p>
-          <p class="tarjeta-valor" id="total-gastos">—</p>
-          <p class="tarjeta-nota" id="nota-gastos"></p>
+      </section>
+
+      <section class="seccion" aria-labelledby="titulo-evolucion">
+        <h2 id="titulo-evolucion">Evolución por trimestre</h2>
+        <p class="seccion-sub">Dinero disponible al cierre de cada trimestre (banco + caja chica).</p>
+        <div class="grafico grafico-linea">
+          <canvas id="grafico-liquidez" role="img" aria-label="Gráfico de liquidez al cierre de cada trimestre"></canvas>
         </div>
-        <div class="tarjeta">
-          <p class="tarjeta-etiqueta" id="saldo-etiqueta">Saldo</p>
-          <p class="tarjeta-valor" id="saldo">—</p>
-          <p class="tarjeta-nota" id="nota-saldo"></p>
-        </div>
-      </div>
-    </section>
+        <details class="tabla-detalle" open>
+          <summary>Ver en tabla</summary>
+          <div id="tabla-trimestres"></div>
+        </details>
+      </section>
 
-    <!-- 2. INGRESOS Y GASTOS POR AÑO (un gráfico + su tabla, como el panel de la junta) -->
-    <section class="seccion" aria-labelledby="titulo-anios">
-      <h2 id="titulo-anios">Ingresos y gastos por año</h2>
-      <p class="seccion-sub" id="sub-anios">Lo que entró y lo que salió cada año.</p>
-      <div class="grafico grafico-linea">
-        <canvas id="grafico-anios" role="img" aria-label="Gráfico de ingresos y gastos por año"></canvas>
-      </div>
-      <details class="tabla-detalle" open>
-        <summary>Ver en tabla</summary>
-        <div id="tabla-anios"></div>
-      </details>
-    </section>
-
-    <!-- 3. DETALLE DEL PERÍODO: de dónde vino y en qué se usó -->
-    <section class="seccion" aria-labelledby="titulo-detalle">
-      <h2 id="titulo-detalle">Detalle <span class="periodo-texto" id="periodo-texto-detalle"></span></h2>
-      <h3>¿De dónde vino el dinero?</h3>
-      <div class="tabla-desplazable" id="tabla-ingresos"></div>
-      <h3>¿En qué se usó?</h3>
-      <div class="tabla-desplazable" id="tabla-gastos"></div>
-    </section>
-
-    <!-- 4. QUÉ LOGRAMOS -->
-    <section class="seccion" aria-labelledby="titulo-impacto">
-      <h2 id="titulo-impacto">¿Qué logramos?</h2>
-      <div id="impacto"></div>
-    </section>
-
-    <!-- 5. CÓMO LEER ESTE PORTAL (nota metodológica) -->
-    <section class="seccion nota" aria-labelledby="titulo-nota">
-      <h2 id="titulo-nota">Cómo leer este portal</h2>
-      <p class="verificacion" id="verificacion"></p>
-      <ul class="nota-lista" id="nota-lista"></ul>
-      <p class="tarjeta-nota" id="nota-fuente"></p>
-      <div id="errores-csv" class="alerta alerta-aviso" hidden></div>
-    </section>
+      <section class="seccion nota" aria-labelledby="titulo-nota">
+        <h2 id="titulo-nota">Cómo leer este panel</h2>
+        <ul class="nota-lista">
+          <li><strong>Total disponible</strong> es el saldo del banco según el estado de cuenta más el efectivo en caja chica.</li>
+          <li><strong>Meses que alcanza</strong> divide el total disponible entre el gasto promedio por mes del último año.</li>
+          <li><strong>Fondos libres</strong> es lo disponible menos los fondos que un donante limitó a un uso específico.</li>
+          <li>Entradas y salidas incluyen todo movimiento de dinero, también devoluciones y dinero de paso, por eso no equivalen a los ingresos y gastos del estado de resultados.</li>
+        </ul>
+        <p class="tarjeta-nota" id="nota-generado"></p>
+        <button type="button" id="boton-salir" class="boton-secundario">Cerrar el panel</button>
+      </section>
+    </div>
 
   </main>
 
   <footer class="pie">
     <div class="contenedor">
-      <p>Portal de transparencia · <span id="pie-org"></span></p>
+      <p>Panel privado de la junta directiva</p>
     </div>
   </footer>
 
-  <!-- Chart.js (gráficos) desde un CDN: no hay que instalar nada -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <!-- Nuestro código, en este orden: leer datos -> calcular -> mostrar -->
-  <script src="js/leer-datos.js"></script>
-  <script src="js/calculos.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/junta.js"></script>
 </body>
 </html>
