@@ -1,0 +1,17 @@
+{
+  "datos_de_ejemplo": false,
+  "programas": [
+    {
+      "programa": "Run 4 Hope 2025",
+      "descripcion": "Carrera y bazar de emprendedores realizados en julio de 2025 para recaudar fondos a favor de Fundacáncer.",
+      "metricas": [
+        {
+          "nombre": "Organizaciones apoyadas con lo recaudado",
+          "valores": {
+            "2025": 1
+          }
+        }
+      ]
+    }
+  ]
+}

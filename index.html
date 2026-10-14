@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transparencia · Fundación Wonder Panamá</title>
+  <meta name="description" content="Cuánto dinero recibió la fundación, en qué lo gastó y qué impacto logró.">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <!-- Aviso de datos ficticios: se muestra solo si info.json dice "datos_de_ejemplo": true -->
+  <div id="aviso-ejemplo" class="aviso-ejemplo" hidden>
+    <strong>DATOS DE EJEMPLO</strong> · <span id="aviso-ejemplo-texto"></span>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <p class="encabezado-org" id="nombre-org">Fundación</p>
+      <h1>¿Cómo usamos tu donación?</h1>
+      <p class="encabezado-sub">Cuánto recibimos y en qué lo usamos. Cifras en <span id="moneda">USD (B/.)</span>.</p>
+      <!-- Selector de año: los botones se crean desde info.json -->
+      <div class="selector-periodo" id="selector-periodo" role="group" aria-label="Elegir período"></div>
+    </div>
+  </header>
+
+  <main class="contenedor">
+
+    <div id="error-general" class="alerta alerta-error" hidden></div>
+
+    <!-- 1. RESUMEN DEL PERÍODO -->
+    <section class="seccion" aria-labelledby="titulo-resumen">
+      <h2 id="titulo-resumen">Resumen <span class="periodo-texto" id="periodo-texto"></span></h2>
+      <div class="tarjetas-resumen">
+        <div class="tarjeta">
+          <p class="tarjeta-etiqueta">Recibimos</p>
+          <p class="tarjeta-valor" id="total-ingresos">—</p>
+          <p class="tarjeta-nota" id="nota-ingresos"></p>
+        </div>
+        <div class="tarjeta">
+          <p class="tarjeta-etiqueta">Gastamos</p>
+          <p class="tarjeta-valor" id="total-gastos">—</p>
+          <p class="tarjeta-nota" id="nota-gastos"></p>
+        </div>
+        <div class="tarjeta">
+          <p class="tarjeta-etiqueta" id="saldo-etiqueta">Saldo</p>
+          <p class="tarjeta-valor" id="saldo">—</p>
+          <p class="tarjeta-nota" id="nota-saldo"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. INGRESOS Y GASTOS POR AÑO (un gráfico + su tabla, como el panel de la junta) -->
+    <section class="seccion" aria-labelledby="titulo-anios">
+      <h2 id="titulo-anios">Ingresos y gastos por año</h2>
+      <p class="seccion-sub" id="sub-anios">Lo que entró y lo que salió cada año.</p>
+      <div class="grafico grafico-linea">
+        <canvas id="grafico-anios" role="img" aria-label="Gráfico de ingresos y gastos por año"></canvas>
+      </div>
+      <details class="tabla-detalle" open>
+        <summary>Ver en tabla</summary>
+        <div id="tabla-anios"></div>
+      </details>
+    </section>
+
+    <!-- 3. DETALLE DEL PERÍODO: de dónde vino y en qué se usó -->
+    <section class="seccion" aria-labelledby="titulo-detalle">
+      <h2 id="titulo-detalle">Detalle <span class="periodo-texto" id="periodo-texto-detalle"></span></h2>
+      <h3>¿De dónde vino el dinero?</h3>
+      <div class="tabla-desplazable" id="tabla-ingresos"></div>
+      <h3>¿En qué se usó?</h3>
+      <div class="tabla-desplazable" id="tabla-gastos"></div>
+    </section>
+
+    <!-- 4. QUÉ LOGRAMOS -->
+    <section class="seccion" aria-labelledby="titulo-impacto">
+      <h2 id="titulo-impacto">¿Qué logramos?</h2>
+      <div id="impacto"></div>
+    </section>
+
+    <!-- 5. CÓMO LEER ESTE PORTAL (nota metodológica) -->
+    <section class="seccion nota" aria-labelledby="titulo-nota">
+      <h2 id="titulo-nota">Cómo leer este portal</h2>
+      <p class="verificacion" id="verificacion"></p>
+      <ul class="nota-lista" id="nota-lista"></ul>
+      <p class="tarjeta-nota" id="nota-fuente"></p>
+      <div id="errores-csv" class="alerta alerta-aviso" hidden></div>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p>Portal de transparencia · <span id="pie-org"></span></p>
+    </div>
+  </footer>
+
+  <!-- Chart.js (gráficos) desde un CDN: no hay que instalar nada -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Nuestro código, en este orden: leer datos -> calcular -> mostrar -->
+  <script src="js/leer-datos.js"></script>
+  <script src="js/calculos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

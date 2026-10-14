@@ -1,0 +1,14 @@
+# Archivos originales de la contabilidad: nunca se publican
+privado/
+
+# Ningún Excel debe subirse, aunque quede fuera de privado/ por error
+*.xlsx
+*.xls
+
+# Archivos temporales de Excel y del sistema
+~$*
+*.tmp
+Thumbs.db
+
+# Configuración local de Claude Code en esta computadora
+.claude/settings.local.json

@@ -1,0 +1,238 @@
+/* =============================================================
+   estilos.css
+   Lo usan el portal público (index.html) y el panel de la junta (junta.html),
+   así los dos se ven igual: tarjetas, un gráfico y tablas.
+   Diseñado primero para celular; en pantallas grandes se ensancha.
+   Los colores se definen una sola vez como "variables" (--nombre)
+   para poder cambiarlos fácilmente y soportar modo oscuro.
+   ============================================================= */
+
+:root {
+  color-scheme: light;
+  --fondo-pagina: #f4f4f1;
+  --fondo-tarjeta: #ffffff;
+  --fondo-suave: #f4f4f1;          /* tarjetas dentro de una sección */
+  --texto: #0b0b0b;
+  --texto-secundario: #52514e;
+  --texto-tenue: #898781;
+  --linea: #e8e7e1;
+  --borde: rgba(11, 11, 11, 0.08);
+
+  /* Colores de los gráficos (paleta validada para daltonismo) */
+  --color-programas: #2a78d6;      /* azul: ingresos / serie principal */
+  --color-administracion: #eb6834; /* naranja: gastos / segunda serie */
+
+  /* Colores de estado (cuadra / no cuadra, saldo) */
+  --color-bien: #006300;
+  --color-error: #d03b3b;
+  --fondo-aviso: #fff4d6;
+  --texto-aviso: #5c4300;
+
+  --radio: 16px;
+  --sombra: 0 1px 2px rgba(11, 11, 11, 0.04), 0 4px 16px rgba(11, 11, 11, 0.04);
+}
+
+/* Modo oscuro: se activa si el celular/computadora está en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --fondo-pagina: #0d0d0d;
+    --fondo-tarjeta: #1a1a19;
+    --fondo-suave: #262624;
+    --texto: #ffffff;
+    --texto-secundario: #c3c2b7;
+    --texto-tenue: #898781;
+    --linea: #2c2c2a;
+    --borde: rgba(255, 255, 255, 0.08);
+    --color-programas: #3987e5;
+    --color-administracion: #d95926;
+    --color-bien: #0ca30c;
+    --color-error: #e66767;
+    --fondo-aviso: #3a2e0a;
+    --texto-aviso: #ffe7a3;
+    --sombra: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --fondo-pagina: #0d0d0d;
+  --fondo-tarjeta: #1a1a19;
+  --fondo-suave: #262624;
+  --texto: #ffffff;
+  --texto-secundario: #c3c2b7;
+  --texto-tenue: #898781;
+  --linea: #2c2c2a;
+  --borde: rgba(255, 255, 255, 0.08);
+  --color-programas: #3987e5;
+  --color-administracion: #d95926;
+  --color-bien: #0ca30c;
+  --color-error: #e66767;
+  --fondo-aviso: #3a2e0a;
+  --texto-aviso: #ffe7a3;
+  --sombra: none;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo-pagina);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.contenedor {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.2rem; margin-bottom: 12px; }
+h3 { font-size: 1rem; margin: 20px 0 4px; }
+
+/* ---------- Aviso de datos de ejemplo ---------- */
+.aviso-ejemplo {
+  background: var(--fondo-aviso);
+  color: var(--texto-aviso);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ---------- Encabezado ---------- */
+.encabezado { padding: 28px 0 8px; }
+.encabezado-org { margin: 0 0 4px; font-weight: 600; color: var(--color-programas); }
+.encabezado-sub { margin: 0 0 16px; color: var(--texto-secundario); }
+
+/* Selector de período: botones cortos (2026, 2025, 2024, Todo) en una fila */
+.selector-periodo {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  box-shadow: var(--sombra);
+}
+.selector-periodo button {
+  flex: 1;
+  font: inherit;
+  font-size: 0.95rem;
+  border: 0;
+  background: transparent;
+  color: var(--texto-secundario);
+  padding: 8px 6px;
+  min-height: 40px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.selector-periodo button:hover { color: var(--texto); }
+.selector-periodo button[aria-pressed="true"] {
+  background: var(--texto);
+  color: var(--fondo-tarjeta);
+  font-weight: 600;
+}
+.selector-periodo button:focus-visible { outline: 2px solid var(--color-programas); outline-offset: 2px; }
+
+/* ---------- Secciones (tarjetas blancas) ---------- */
+.seccion {
+  background: var(--fondo-tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 20px;
+  margin: 16px 0;
+}
+.seccion-sub { margin: 0 0 12px; color: var(--texto-secundario); font-size: 0.95rem; }
+.periodo-texto { color: var(--texto-tenue); font-weight: 400; }
+
+/* ---------- Tarjetas de cifras ---------- */
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: 1fr;   /* celular: una debajo de otra */
+  gap: 12px;
+  margin-top: 8px;
+}
+.tarjeta {
+  background: var(--fondo-suave);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.tarjeta-etiqueta { margin: 0; color: var(--texto-secundario); font-size: 0.9rem; }
+.tarjeta-valor { margin: 2px 0 0; font-size: 1.6rem; font-weight: 650; white-space: nowrap; }
+.tarjeta-valor.positivo { color: var(--color-bien); }
+.tarjeta-valor.negativo { color: var(--color-error); }
+.tarjeta-nota { margin: 2px 0 0; font-size: 0.85rem; color: var(--texto-tenue); }
+
+/* ---------- Gráficos ---------- */
+.grafico { position: relative; width: 100%; } /* Chart.js lo necesita para ajustar el tamaño */
+.grafico-linea { height: 260px; }
+
+/* ---------- Tablas ---------- */
+.tabla-detalle { margin-top: 12px; }
+.tabla-detalle summary { cursor: pointer; color: var(--color-programas); font-size: 0.9rem; padding: 6px 0; }
+.tabla-desplazable { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin-top: 4px; }
+th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--linea); }
+th { color: var(--texto-secundario); font-weight: 600; font-size: 0.85rem; }
+td.numero, th.numero { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tfoot td { font-weight: 700; border-bottom: 0; }
+
+/* ---------- Notas ---------- */
+.nota-lista { padding-left: 20px; color: var(--texto-secundario); font-size: 0.92rem; }
+.nota-lista li { margin-bottom: 4px; }
+.verificacion { margin: 0 0 8px; font-size: 0.95rem; }
+.verificacion span { font-weight: 700; margin-right: 4px; }
+.verificacion.ok span { color: var(--color-bien); }
+.verificacion.mal { color: var(--color-error); }
+
+/* ---------- Alertas ---------- */
+.alerta { border-radius: 12px; padding: 12px 16px; margin: 16px 0; font-size: 0.95rem; }
+.alerta-error { background: var(--fondo-aviso); color: var(--texto-aviso); border-left: 4px solid var(--color-error); border-radius: 0; }
+.alerta-aviso { background: var(--fondo-aviso); color: var(--texto-aviso); }
+.alerta ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* ---------- Pie de página ---------- */
+.pie { padding: 16px 0 40px; color: var(--texto-tenue); font-size: 0.85rem; text-align: center; }
+.pie a { color: inherit; }
+
+/* ---------- Pantallas medianas y grandes ---------- */
+@media (min-width: 640px) {
+  h1 { font-size: 2.2rem; }
+  .selector-periodo { display: inline-flex; }
+  .selector-periodo button { flex: none; padding: 8px 20px; }
+  .seccion { padding: 24px; }
+  .tarjetas-resumen { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------- Panel de la junta (junta.html) ---------- */
+.form-acceso { display: grid; gap: 8px; max-width: 360px; }
+.form-acceso label { font-size: 0.9rem; color: var(--texto-secundario); }
+.form-acceso input {
+  font: inherit;
+  padding: 10px 12px;
+  min-height: 44px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--fondo-pagina);
+  color: var(--texto);
+}
+.form-acceso input:focus-visible { outline: 2px solid var(--color-programas); outline-offset: 1px; }
+.form-acceso button, .boton-secundario {
+  font: inherit;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.form-acceso button { border: 0; background: var(--texto); color: var(--fondo-tarjeta); }
+.form-acceso button:disabled { opacity: 0.6; cursor: wait; }
+.boton-secundario { margin-top: 12px; border: 1px solid var(--borde); background: transparent; color: var(--texto); }
+.mensaje-acceso { min-height: 1.5em; margin: 8px 0 0; color: var(--color-error); font-size: 0.95rem; }

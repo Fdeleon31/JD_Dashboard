@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Que los buscadores no muestren esta página -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de la junta</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <p class="encabezado-org" id="nombre-org">Panel de la junta</p>
+      <h1>Liquidez y caja</h1>
+      <p class="encabezado-sub">Uso interno de la junta directiva. Cifras en USD (B/.).</p>
+    </div>
+  </header>
+
+  <main class="contenedor">
+
+    <!-- 1. CONTRASEÑA: los datos están cifrados y solo se abren aquí, en tu navegador -->
+    <section class="seccion" id="seccion-acceso" aria-labelledby="titulo-acceso">
+      <h2 id="titulo-acceso">Acceso</h2>
+      <p class="seccion-sub">Escribe la contraseña que te compartió la Dirección de Finanzas.</p>
+      <form id="form-acceso" class="form-acceso">
+        <label for="clave">Contraseña</label>
+        <input id="clave" type="password" autocomplete="current-password" required>
+        <button type="submit" id="boton-entrar">Entrar</button>
+      </form>
+      <p id="mensaje-acceso" class="mensaje-acceso" role="alert"></p>
+    </section>
+
+    <!-- 2. PANEL: se muestra solo después de descifrar -->
+    <div id="panel" hidden>
+
+      <section class="seccion" aria-labelledby="titulo-liquidez">
+        <h2 id="titulo-liquidez">Liquidez al <span id="fecha-corte">—</span></h2>
+        <div class="tarjetas-resumen">
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Total disponible</p>
+            <p class="tarjeta-valor" id="liquidez-total">—</p>
+            <p class="tarjeta-nota" id="liquidez-detalle"></p>
+          </div>
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Meses que alcanza</p>
+            <p class="tarjeta-valor" id="meses-cubiertos">—</p>
+            <p class="tarjeta-nota" id="meses-detalle"></p>
+          </div>
+          <div class="tarjeta">
+            <p class="tarjeta-etiqueta">Fondos libres</p>
+            <p class="tarjeta-valor" id="fondos-libres">—</p>
+            <p class="tarjeta-nota" id="fondos-detalle"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="seccion" aria-labelledby="titulo-evolucion">
+        <h2 id="titulo-evolucion">Evolución por trimestre</h2>
+        <p class="seccion-sub">Dinero disponible al cierre de cada trimestre (banco + caja chica).</p>
+        <div class="grafico grafico-linea">
+          <canvas id="grafico-liquidez" role="img" aria-label="Gráfico de liquidez al cierre de cada trimestre"></canvas>
+        </div>
+        <details class="tabla-detalle" open>
+          <summary>Ver en tabla</summary>
+          <div id="tabla-trimestres"></div>
+        </details>
+      </section>
+
+      <section class="seccion nota" aria-labelledby="titulo-nota">
+        <h2 id="titulo-nota">Cómo leer este panel</h2>
+        <ul class="nota-lista">
+          <li><strong>Total disponible</strong> es el saldo del banco según el estado de cuenta más el efectivo en caja chica.</li>
+          <li><strong>Meses que alcanza</strong> divide el total disponible entre el gasto promedio por mes del último año.</li>
+          <li><strong>Fondos libres</strong> es lo disponible menos los fondos que un donante limitó a un uso específico.</li>
+          <li>Entradas y salidas incluyen todo movimiento de dinero, también devoluciones y dinero de paso, por eso pueden no coincidir con los ingresos y gastos del portal público.</li>
+        </ul>
+        <p class="tarjeta-nota" id="nota-generado"></p>
+        <button type="button" id="boton-salir" class="boton-secundario">Cerrar el panel</button>
+      </section>
+    </div>
+
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p>Panel privado de la junta · <a href="index.html">Ver el portal público</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/junta.js"></script>
+</body>
+</html>

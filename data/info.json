@@ -1,0 +1,43 @@
+{
+  "organizacion": "Fundación Wonder Panamá",
+  "datos_de_ejemplo": false,
+  "aviso_datos_de_ejemplo": "Todas las cifras de esta página son FICTICIAS y sirven solo para probar el portal. No representan las finanzas reales de la fundación.",
+  "moneda": "USD (B/.)",
+  "fecha_corte": "2026-09-30",
+  "preparado_por": "Dirección de Finanzas, Fundación Wonder Panamá",
+  "fuente": "Contabilidad de la fundación (estado de cuenta bancario y caja chica), publicada como totales anuales.",
+  "periodo_inicial": "2025",
+  "periodos": [
+    {
+      "id": "2026",
+      "nombre": "Año 2026 (ene 2026 a sep 2026)",
+      "desde": "2026-01-01",
+      "hasta": "2026-09-30"
+    },
+    {
+      "id": "2025",
+      "nombre": "Año 2025",
+      "desde": "2025-01-01",
+      "hasta": "2025-12-31"
+    },
+    {
+      "id": "2024",
+      "nombre": "Año 2024 (oct 2024 a dic 2024)",
+      "desde": "2024-10-31",
+      "hasta": "2024-12-31"
+    },
+    {
+      "id": "todo",
+      "nombre": "Todo (oct 2024 a sep 2026)",
+      "desde": "2024-10-31",
+      "hasta": "2026-09-30"
+    }
+  ],
+  "notas": [
+    "Los ingresos se registran cuando el dinero entra a la cuenta bancaria o a la caja chica; los gastos, cuando se pagan.",
+    "Se publican totales anuales por fuente y por programa, no movimientos individuales.",
+    "\"Administración\" incluye honorarios, servicios legales y contables, impuestos, comisiones bancarias y gastos generales que no pertenecen a un programa.",
+    "El período de 2024 cubre solo octubre a diciembre y el de 2026 llega hasta la fecha de corte.",
+    "No se publican nombres ni datos personales de donantes ni de beneficiarios."
+  ]
+}
