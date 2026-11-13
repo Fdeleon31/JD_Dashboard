@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Que los buscadores no muestren esta página -->
+  <meta name="robots" content="noindex, nofollow">
+  <!-- Seguridad: la página solo puede cargar archivos de este mismo sitio.
+       No usa servicios externos (ni fuentes ni librerías de terceros). -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Panel de la junta directiva · Fundación Wonder Panamá</title>
+  <!-- Sin ícono de pestaña (evita una descarga innecesaria) -->
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <div class="hoja">
+
+    <header class="encabezado">
+      <p class="encabezado-org" id="nombre-org">Fundación Wonder Panamá</p>
+      <h1>Panel de la junta directiva</h1>
+      <p class="encabezado-sub" id="encabezado-sub">Liquidez y caja de la fundación. Uso interno.</p>
+    </header>
+
+    <main>
+
+      <!-- 1. ACCESO: los datos están cifrados y solo se abren aquí, en el navegador -->
+      <section class="acceso" id="seccion-acceso" aria-labelledby="titulo-acceso">
+        <h2 id="titulo-acceso">Acceso de la junta</h2>
+        <p class="texto-secundario">Escribe la contraseña que compartió la Dirección de Finanzas.</p>
+        <form id="form-acceso" class="form-acceso">
+          <label for="clave">Contraseña</label>
+          <div class="campo-clave">
+            <input id="clave" type="password" autocomplete="current-password" required>
+            <button type="button" id="boton-ver-clave" class="boton-texto" aria-pressed="false">Mostrar</button>
+          </div>
+          <button type="submit" id="boton-entrar" class="boton-principal">Abrir el panel</button>
+        </form>
+        <p id="mensaje-acceso" class="mensaje-acceso" role="alert"></p>
+        <p class="texto-tenue">Los datos están cifrados y se abren solo en este dispositivo. La contraseña no se guarda.</p>
+      </section>
+
+      <!-- 2. PANEL: se muestra solo después de descifrar -->
+      <div id="panel" hidden>
+
+        <!-- Aviso si los datos ya deberían haberse actualizado -->
+        <p class="aviso" id="aviso-antiguedad" hidden></p>
+
+        <!-- 2a. Conclusión: lo primero que debe leer la junta -->
+        <section class="bloque conclusion" aria-labelledby="titulo-conclusion">
+          <h2 id="titulo-conclusion" class="solo-lectores" tabindex="-1">Situación de liquidez</h2>
+          <p class="estado" id="estado">
+            <span class="estado-icono" id="estado-icono" aria-hidden="true"></span>
+            <span id="estado-texto"></span>
+          </p>
+          <p class="conclusion-frase" id="conclusion-frase"></p>
+          <p class="conclusion-detalle" id="conclusion-detalle"></p>
+
+          <!-- Regla de meses: cuántos meses de gastos cubre el dinero disponible -->
+          <div class="regla" id="regla" role="img" aria-label="">
+            <div class="regla-pista">
+              <div class="regla-relleno" id="regla-relleno"></div>
+              <div class="regla-meta" id="regla-meta"></div>
+            </div>
+            <div class="regla-escala" id="regla-escala"></div>
+            <p class="regla-leyenda">
+              <span class="clave-relleno" id="clave-relleno"></span> <span id="regla-leyenda-valor"></span>
+              <span class="clave-meta"></span> <span id="regla-leyenda-meta"></span>
+            </p>
+          </div>
+        </section>
+
+        <!-- 2b. Las tres cifras de respaldo -->
+        <section class="bloque" aria-labelledby="titulo-cifras">
+          <h2 id="titulo-cifras">Las cifras al <span id="fecha-corte"></span></h2>
+          <dl class="cifras">
+            <div class="cifra">
+              <dt>Total disponible</dt>
+              <dd class="cifra-valor" id="liquidez-total"></dd>
+              <dd class="cifra-nota" id="liquidez-detalle"></dd>
+            </div>
+            <div class="cifra">
+              <dt>Fondos libres</dt>
+              <dd class="cifra-valor" id="fondos-libres"></dd>
+              <dd class="cifra-nota" id="fondos-detalle"></dd>
+            </div>
+            <div class="cifra">
+              <dt>Salida promedio por mes</dt>
+              <dd class="cifra-valor" id="salida-promedio"></dd>
+              <dd class="cifra-nota" id="salida-detalle"></dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- 2c. Qué cambió en el último trimestre -->
+        <section class="bloque" aria-labelledby="titulo-cambio">
+          <h2 id="titulo-cambio">Qué cambió en <span id="trimestre-actual"></span></h2>
+          <p class="cambio-frase" id="cambio-frase"></p>
+          <dl class="cifras cifras-chicas">
+            <div class="cifra">
+              <dt>Entró</dt>
+              <dd class="cifra-valor" id="cambio-entradas"></dd>
+            </div>
+            <div class="cifra">
+              <dt>Salió</dt>
+              <dd class="cifra-valor" id="cambio-salidas"></dd>
+            </div>
+            <div class="cifra">
+              <dt>Diferencia</dt>
+              <dd class="cifra-valor" id="cambio-neto"></dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- 2d. Evolución -->
+        <section class="bloque" aria-labelledby="titulo-evolucion">
+          <h2 id="titulo-evolucion">Dinero disponible al cierre de cada trimestre</h2>
+          <p class="texto-secundario">Banco más caja chica, en balboas (B/.).</p>
+          <p class="leyenda" id="leyenda-grafico"></p>
+          <div class="grafico" id="grafico">
+            <div class="grafico-globo" id="grafico-globo" hidden></div>
+          </div>
+          <div class="tabla-desplazable">
+            <table id="tabla-trimestres">
+              <caption class="solo-lectores">Entradas, salidas y dinero disponible por trimestre</caption>
+            </table>
+          </div>
+        </section>
+
+        <!-- 2e. Cómo leer el panel -->
+        <section class="bloque" aria-labelledby="titulo-ayuda">
+          <h2 id="titulo-ayuda">Cómo leer este panel</h2>
+          <dl class="glosario">
+            <dt>Total disponible</dt>
+            <dd>El saldo del banco según el estado de cuenta más el efectivo en caja chica.</dd>
+            <dt>Fondos libres</dt>
+            <dd>Lo disponible menos los fondos que un donante limitó a un uso específico.</dd>
+            <dt>Salida promedio por mes</dt>
+            <dd>Todo el dinero que salió en los últimos cuatro trimestres, dividido entre doce meses.</dd>
+            <dt>Meses que alcanza</dt>
+            <dd>El total disponible dividido entre la salida promedio por mes. Supone que no entra dinero nuevo.</dd>
+            <dt>Meta de reserva</dt>
+            <dd id="ayuda-meta"></dd>
+            <dt>Entradas y salidas</dt>
+            <dd>Incluyen todo movimiento de dinero, también devoluciones y dinero de paso. Por eso no equivalen a los ingresos y gastos del estado de resultados.</dd>
+          </dl>
+        </section>
+
+        <footer class="pie">
+          <p id="nota-generado"></p>
+          <p>Preguntas sobre estas cifras: Dirección de Finanzas.</p>
+          <div class="pie-acciones">
+            <button type="button" id="boton-imprimir" class="boton-secundario">Imprimir o guardar en PDF</button>
+            <button type="button" id="boton-salir" class="boton-secundario">Cerrar el panel</button>
+          </div>
+        </footer>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/junta.js"></script>
+</body>
+</html>

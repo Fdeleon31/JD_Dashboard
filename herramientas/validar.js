@@ -2,23 +2,23 @@
 // validar.js
 // Revisa, ANTES de publicar, que el panel de la junta esté listo.
 //
-// Uso:  node validar.js
+// Uso:  node herramientas/validar.js
 // Termina con "TODO CORRECTO" o con la lista de problemas.
 // =============================================================
 
 const fs = require('fs');
 const path = require('path');
 
-const RAIZ = __dirname;
+const RAIZ = path.join(__dirname, '..'); // la carpeta del proyecto
 const problemas = [];
 
 const rutaResumen = path.join(RAIZ, 'privado', 'resumen-junta.json');
-const rutaCifrado = path.join(RAIZ, 'data', 'junta.cifrado.json');
+const rutaCifrado = path.join(RAIZ, 'docs', 'data', 'junta.cifrado.json');
 
 // 1. Datos de la junta generados por importar-excel.js
 let resumen = null;
 if (!fs.existsSync(rutaResumen)) {
-  problemas.push('No existe privado/resumen-junta.json. Corre: node importar-excel.js');
+  problemas.push('No existe privado/resumen-junta.json. Corre: node herramientas/importar-excel.js');
 } else {
   resumen = JSON.parse(fs.readFileSync(rutaResumen, 'utf8'));
   const l = resumen.liquidez;
@@ -35,20 +35,32 @@ if (!fs.existsSync(rutaResumen)) {
 
 // 2. Archivo cifrado que se publica: debe existir y estar al día
 if (!fs.existsSync(rutaCifrado)) {
-  problemas.push('No existe data/junta.cifrado.json. Corre: node cifrar-junta.js');
+  problemas.push('No existe docs/data/junta.cifrado.json. Corre: node herramientas/cifrar-junta.js');
 } else if (resumen) {
   const cifrado = JSON.parse(fs.readFileSync(rutaCifrado, 'utf8'));
   if (cifrado.fecha_corte !== resumen.fecha_corte) {
-    problemas.push('El panel publicado tiene corte ' + cifrado.fecha_corte + ' y los datos nuevos ' + resumen.fecha_corte + '. Corre: node cifrar-junta.js');
+    problemas.push('El panel publicado tiene corte ' + cifrado.fecha_corte + ' y los datos nuevos ' + resumen.fecha_corte + '. Corre: node herramientas/cifrar-junta.js');
   } else {
     console.log('✓ Panel cifrado al día.');
   }
 }
 
-// 3. Nada privado dentro de data/ (lo único que se publica ahí es el archivo cifrado)
-fs.readdirSync(path.join(RAIZ, 'data')).forEach(function (nombre) {
-  if (nombre !== 'junta.cifrado.json') problemas.push('data/' + nombre + ' se publicaría. Bórralo o muévelo a privado/.');
-});
+// 3. Nada privado dentro de docs/, que es la carpeta que se publica.
+//    En docs/data/ solo puede estar el archivo cifrado, y en todo docs/
+//    no puede haber Excel, CSV ni otros JSON.
+function recorrer(carpeta) {
+  fs.readdirSync(carpeta, { withFileTypes: true }).forEach(function (entrada) {
+    const ruta = path.join(carpeta, entrada.name);
+    if (entrada.isDirectory()) return recorrer(ruta);
+    const relativa = path.relative(RAIZ, ruta).split(path.sep).join('/');
+    const extension = path.extname(entrada.name).toLowerCase();
+    const esDato = ['.xlsx', '.xls', '.csv', '.json'].includes(extension);
+    if (esDato && relativa !== 'docs/data/junta.cifrado.json') {
+      problemas.push(relativa + ' se publicaría. Bórralo o muévelo a privado/.');
+    }
+  });
+}
+recorrer(path.join(RAIZ, 'docs'));
 
 console.log('');
 if (problemas.length === 0) {
