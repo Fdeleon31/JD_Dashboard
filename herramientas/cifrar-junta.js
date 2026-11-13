@@ -1,19 +1,19 @@
 // =============================================================
 // cifrar-junta.js
-// Prepara los datos de la página de la junta (junta.html).
+// Prepara los datos del panel de la junta (docs/index.html).
 //
 // Toma privado/resumen-junta.json (que nunca se publica), lo CIFRA
-// con una contraseña y guarda el resultado en data/junta.cifrado.json.
+// con una contraseña y guarda el resultado en docs/data/junta.cifrado.json.
 // Ese archivo sí se publica, pero sin la contraseña es ilegible.
-// La página junta.html pide la contraseña y descifra los datos en el
-// navegador de cada miembro de la junta.
+// El panel pide la contraseña y descifra los datos en el navegador
+// de cada miembro de la junta.
 //
-// Uso:  node cifrar-junta.js
+// Uso:  node herramientas/cifrar-junta.js
 //       Te pide la contraseña dos veces (no se ve al escribir).
 //
 // Importante:
 //   - Usa una contraseña larga (mínimo 12 caracteres). Una frase sirve:
-//     "wonder-corre-por-fundacancer-2025".
+//     varias palabras que solo la junta conozca. No uses ejemplos de la documentación.
 //   - La contraseña no se guarda en ningún archivo. Si la pierdes, vuelve
 //     a correr este script con una nueva y compártela con la junta.
 //   - Si alguien deja la junta, cambia la contraseña: corre este script
@@ -25,11 +25,11 @@ const path = require('path');
 const crypto = require('crypto');
 const readline = require('readline');
 
-const RAIZ = __dirname;
+const RAIZ = path.join(__dirname, '..'); // la carpeta del proyecto
 const ORIGEN = path.join(RAIZ, 'privado', 'resumen-junta.json');
-const DESTINO = path.join(RAIZ, 'data', 'junta.cifrado.json');
+const DESTINO = path.join(RAIZ, 'docs', 'data', 'junta.cifrado.json');
 
-// Parámetros de cifrado. El navegador (js/junta.js) usa exactamente los mismos.
+// Parámetros de cifrado. El navegador (docs/js/junta.js) usa exactamente los mismos.
 const ITERACIONES = 600000;   // más iteraciones = más lento probar contraseñas por fuerza bruta
 const LARGO_MINIMO = 12;
 
@@ -57,7 +57,7 @@ function pedirOculto(pregunta) {
 
 async function principal() {
   if (!fs.existsSync(ORIGEN)) {
-    console.error('No existe privado/resumen-junta.json. Corre primero: node importar-excel.js');
+    console.error('No existe privado/resumen-junta.json. Corre primero: node herramientas/importar-excel.js');
     process.exit(1);
   }
   const texto = fs.readFileSync(ORIGEN, 'utf8');
@@ -96,8 +96,8 @@ async function principal() {
     datos: cifrado.toString('base64')
   }, null, 2) + '\n', 'utf8');
 
-  console.log('Listo: data/junta.cifrado.json (corte ' + resumen.fecha_corte + ').');
-  console.log('La junta entra en junta.html con esa contraseña. Compártela por un canal privado, no por el mismo correo que el enlace.');
+  console.log('Listo: docs/data/junta.cifrado.json (corte ' + resumen.fecha_corte + ').');
+  console.log('La junta entra al panel con esa contraseña. Compártela por un canal privado, no por el mismo correo que el enlace.');
 }
 
 principal();

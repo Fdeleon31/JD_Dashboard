@@ -1,9 +1,10 @@
 // =============================================================
 // servidor.js
-// Servidor web mínimo para ver el portal en tu computadora.
+// Servidor web mínimo para ver el panel en tu computadora.
+// Sirve solo la carpeta docs/, igual que GitHub Pages.
 // No necesita instalar paquetes: solo usa lo que trae Node.js.
 //
-// Uso:      node servidor.js
+// Uso:      node herramientas/servidor.js
 // Luego abre http://localhost:8000 en el navegador.
 // Para detenerlo: Ctrl + C
 // =============================================================
@@ -13,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PUERTO = 8000;
-const RAIZ = __dirname; // la carpeta donde está este archivo
+const RAIZ = path.join(__dirname, '..', 'docs'); // lo mismo que se publica
 
 // Tipo de contenido según la extensión del archivo
 const TIPOS = {
@@ -24,6 +25,7 @@ const TIPOS = {
   '.csv': 'text/csv; charset=utf-8',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
   '.ico': 'image/x-icon'
 };
 
@@ -31,9 +33,9 @@ const servidor = http.createServer(function (pedido, respuesta) {
   let ruta = decodeURIComponent(new URL(pedido.url, 'http://localhost').pathname);
   if (ruta === '/') ruta = '/index.html';
 
-  // Ruta completa del archivo, sin permitir salir de la carpeta del proyecto
+  // Ruta completa del archivo, sin permitir salir de la carpeta docs/
   const archivo = path.join(RAIZ, path.normalize(ruta));
-  if (!archivo.startsWith(RAIZ)) {
+  if (archivo !== RAIZ && !archivo.startsWith(RAIZ + path.sep)) {
     respuesta.writeHead(403);
     return respuesta.end('Prohibido');
   }
@@ -50,5 +52,5 @@ const servidor = http.createServer(function (pedido, respuesta) {
 });
 
 servidor.listen(PUERTO, function () {
-  console.log('Portal disponible en http://localhost:' + PUERTO + '  (Ctrl + C para detener)');
+  console.log('Panel disponible en http://localhost:' + PUERTO + '  (Ctrl + C para detener)');
 });

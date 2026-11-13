@@ -1,59 +1,64 @@
-# Proyecto: Portal de Transparencia para ONGs
-
-> **Estado actual (oct 2026):** el portal público para donantes se retiró. Lo publicado es solo
-> el **panel privado de la junta** (index.html, con contraseña y datos cifrados). La versión pública
-> quedó en el historial de git por si se retoma. Flujo vigente: ver README.md.
+# Proyecto: Panel de la junta directiva — Fundación Wonder Panamá
 
 ## Qué es
-Una página web pública donde una ONG muestra a sus donantes, de forma clara y verificable, cuánto dinero recibió, en qué lo gastó y qué impacto logró. El primer cliente y caso de prueba es **Fundación Wonder Panamá**.
+Una página privada donde la junta directiva de Fundación Wonder Panamá ve la **liquidez** de la
+fundación: cuánto dinero hay disponible, para cuántos meses alcanza y cómo cambió por trimestre.
+Se publica en GitHub Pages (repo `JD_Dashboard`, carpeta `docs/`).
 
-## Problema que resuelve
-Las ONGs pequeñas en Panamá pierden donantes y credibilidad porque no pueden mostrar fácilmente el uso de los fondos. Sus reportes financieros (libro diario, mayor, estado de resultados) no son entendibles para un donante común.
+El objetivo es que la junta entienda las cifras **sin depender de la Dirección de Finanzas**:
+el panel saca sus propias conclusiones a partir de los datos y las explica en lenguaje sencillo.
 
-## Usuario objetivo
-- **Donante / público general:** quiere saber, en 1 minuto, si su dinero se usó bien.
-- **Director de finanzas de la ONG (yo):** quiere publicar esa información sin rehacer su contabilidad.
+Historia: el proyecto empezó como un portal público de transparencia para donantes. Ese portal
+se retiró (queda en el historial de git). Hoy solo existe el panel de la junta.
 
-## Fase 1 — MVP (lo único que construimos primero)
-Una página estática que lee un archivo de datos (CSV exportado de la contabilidad) y muestra:
+## Usuarios
+- **Junta directiva:** no son contadores. Abren el panel en el celular o en una reunión.
+- **Director de finanzas (yo):** actualiza los datos cada trimestre desde su computadora.
 
-1. **Resumen del período:** total de ingresos, total de gastos y saldo.
-2. **De dónde viene el dinero:** ingresos por fuente (donaciones individuales, empresas, eventos, otros).
-3. **A dónde va el dinero:** gastos por programa vs. gastos administrativos, con porcentaje de cada uno.
-4. **Indicadores de impacto:** 3 a 5 métricas sencillas por programa (ej. beneficiarios atendidos, eventos realizados).
-5. **Nota metodológica:** período cubierto, fecha de corte y quién preparó la información.
+## Estructura
+```
+docs/           Lo ÚNICO que se publica: index.html, css/, js/, fonts/, data/junta.cifrado.json
+herramientas/   Programas de Node.js que preparan los datos (corren solo en mi computadora)
+privado/        Contabilidad original (.xlsx) y resumen sin cifrar. NUNCA se publica (.gitignore)
+```
 
-Fuera de alcance en la Fase 1: login, panel de administración, base de datos, múltiples ONGs, pagos o donaciones en línea.
+## Flujo de datos
+Google Sheet de contabilidad → descarga .xlsx en `privado/` → `node herramientas/actualizar.js`
+(importar → cifrar → validar) → `git push`. Detalle paso a paso en README.md.
 
-## Datos de entrada
-Archivo `data/movimientos.csv` con estas columnas:
+- `importar-excel.js` revisa seis controles del Sheet (deben estar en cero) y genera
+  `privado/resumen-junta.json`.
+- `cifrar-junta.js` cifra ese resumen con la contraseña de la junta (PBKDF2 + AES-256-GCM)
+  y escribe `docs/data/junta.cifrado.json`.
+- `docs/js/junta.js` descifra en el navegador e interpreta los datos: estado de la reserva,
+  frases, regla de meses, gráfico y tabla.
 
-| columna     | ejemplo               | descripción                                         |
-|-------------|-----------------------|-----------------------------------------------------|
-| fecha       | 2026-03-15            | Formato AAAA-MM-DD                                  |
-| tipo        | ingreso / gasto       | Naturaleza del movimiento                           |
-| categoria   | Donaciones empresas   | Fuente del ingreso o tipo de gasto                  |
-| programa    | Programa educativo    | Programa al que se asigna (o "Administración")      |
-| descripcion | Compra de materiales  | Texto corto                                         |
-| monto       | 250.00                | Siempre positivo, en USD (B/.)                      |
+## Reglas que no se rompen
+- **Nada privado en `docs/`.** Ahí solo va el archivo cifrado. Nunca Excel, CSV ni JSON sin cifrar.
+- **Nunca leer ni publicar datos personales:** las columnas "Descripción del banco" y "Nota"
+  del Sheet tienen nombres de personas y no se leen.
+- **Las cifras del panel deben cuadrar con la contabilidad.** Si un control no está en cero,
+  no se publica. Al cambiar el importador, comprobar que el resumen sale igual.
+- **El formato de `resumen-junta.json` y del archivo cifrado no cambia sin avisar:** el archivo
+  ya publicado debe seguir abriéndose con la misma contraseña.
+- **Sin servicios externos en la página.** Tipografía, gráfico y código viven en `docs/`.
+  La página tiene una política de seguridad (CSP) que bloquea todo lo que no sea del propio sitio.
+- **Sin paquetes de npm.** Solo Node.js, para que cualquiera pueda correrlo.
+- **La contraseña nunca se escribe en un archivo ni en un comando.**
 
-Archivo `data/impacto.json` con las métricas de impacto por programa.
-
-Mientras no haya datos reales, usar **datos ficticios de ejemplo** claramente marcados como tales.
-
-## Stack técnico
-- HTML + CSS + JavaScript sencillo (o Vite si hace falta), sin backend.
-- Gráficos con Chart.js.
-- Publicación gratuita en GitHub Pages o Vercel.
-- Debe verse bien en el celular (la mayoría de donantes lo abrirá ahí).
-
-## Principios
-- Claridad antes que diseño complejo: un donante sin conocimientos contables debe entenderlo.
-- Los totales de la página deben cuadrar exactamente con el CSV (validar sumas).
-- Nunca publicar datos personales de donantes ni beneficiarios.
+## Cómo trabajar en este proyecto
 - Código simple y comentado en español: estoy aprendiendo.
+- Textos del panel en lenguaje llano, sin jerga contable; cada cifra dice qué significa.
+- Primero celular. Debe funcionar en modo claro, modo oscuro e impresión.
+- El estado nunca se comunica solo con color: siempre lleva ícono y texto.
+- Git solo por consola (línea de comandos), nunca GitHub Desktop.
+- Ver la página: `node herramientas/servidor.js` → http://localhost:8000
 
-## Fases siguientes (más adelante)
-- Fase 2: panel privado para subir el CSV sin tocar código.
-- Fase 3: soporte para varias ONGs, cada una con su propia página.
-- Fase 4: comparación entre períodos y descarga del reporte en PDF.
+## Criterios de la junta
+Están al inicio de `docs/js/junta.js`: meta de reserva (3 meses de salidas), mínimo crítico
+(1 mes) y días de gracia para avisar que faltan datos (45). Cambiarlos ahí cambia todo el panel.
+
+## Pendiente
+- Lectura automática del Google Sheet con una cuenta de servicio de solo lectura
+  (reemplaza la descarga manual del .xlsx).
+- Opcional, a decidir: actualización programada sin intervención.

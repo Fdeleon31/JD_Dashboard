@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "portal",
+      "name": "panel",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["servidor.js"],
+      "runtimeArgs": ["herramientas/servidor.js"],
       "port": 8000
     }
   ]
